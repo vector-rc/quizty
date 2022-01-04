@@ -52,7 +52,7 @@ export default {
         question: {
           id: questionId,
           question: "",
-          type_answers: "single",
+          type_answer: "single",
           required: true,
         },
 
@@ -83,7 +83,7 @@ export default {
         ? -1
         : duration_quiz.value * 60;
       store.state.questions.forEach((e) => {
-        if (e.type_answers == "free") {
+        if (e.type_answer == "free") {
           store.commit("removeQuestionAnswers", { questionId: e.id });
         }
       });
@@ -91,7 +91,7 @@ export default {
 
       const quizId = await store.dispatch("saveQuiz");
       await alert(
-        `Quiz creado, ingres a ${window.location.origin + "/#/Quiz/" + quizId}`
+        `Quiz creado, ingres a ${window.location.origin + "/Quiz/" + quizId}`
       );
     };
 

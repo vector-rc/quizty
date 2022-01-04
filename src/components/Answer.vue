@@ -1,15 +1,16 @@
 <template>
   <div class="answer">
     <label>
+      {{id}}
       <input
-        v-if="type_answers == 'multiple'"
+        v-if="type_answer == 'multiple'"
         @change="$emit('checkAnswer', id)"
         :name="modelValue"
         :value="modelValue"
         type="checkbox"
       />
       <input
-        v-if="type_answers == 'single'"
+        v-if="type_answer == 'single'"
         @input="$emit('update:modelValue', $event.target.value)"
         :name="modelValue"
         :value="answer.id"
@@ -27,7 +28,7 @@ export default {
   props: {
     answer: Object,
     modelValue: [String, Array],
-    type_answers: String,
+    type_answer: String,
   },
   setup(props) {
     const id = ref(props.answer.id);

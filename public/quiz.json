@@ -8,19 +8,19 @@
             {
                 "id": "0xr6v3ltfqknwu",
                 "question": "¿Cual es tu nombre?",
-                "type_answers": "free",
+                "type_answer": "free",
                 "required":true
             },
             {
                 "id": "b2527874dz7akf",
                 "question": "¿cual es tu edad?",
-                "type_answers": "single",
+                "type_answer": "single",
                 "required":true
             },
             {
                 "id": "c1x2vfc1ep0kcx",
                 "question": "¿Cualles son tus deportes favoritos?",
-                "type_answers": "multiple",
+                "type_answer": "multiple",
                 "required":false
             }
         ],

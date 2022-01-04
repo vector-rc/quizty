@@ -8,20 +8,20 @@
       class="answer"
       style="border: none; border-bottom: 1px solid #2c3e5066"
       type="text"
-      v-model="checkedAnswers"
-      v-if="question.type_answers == 'free'"
+     v-model="response"
+      v-if="question.type_answer == 'free'"
     />
-    <div v-if="question.type_answers != 'free'" class="answers">
+    <div v-if="question.type_answer != 'free'" class="answers">
       <answer
         v-for="answer in answers"
         :key="answer.id"
         :answer="answer"
-        :type_answers="question.type_answers"
-        @checkAnswer="checkAnswer($event)"
-        v-model="checkedAnswers"
+        :type_answer="question.type_answer"
+        @checkAnswer="setResponse($event)"
+        v-model="response"
       />
     </div>
-    <!-- <button @click="seeChecked">ver respuesta</button> -->
+    <button @click="seeChecked">ver respuesta</button>
   </div>
 </template>
 
@@ -37,18 +37,24 @@ export default {
   },
   setup(props) {
     const store = useStore();
-    const checkedAnswers = ref([]);
+    const response = ref([]);
 
-    const checkAnswer = (e) => {
-      let index = checkedAnswers.value.findIndex((i) => i === e);
+    const setResponse = (e) => {
+
+      let index = response.value.findIndex((i) => i === e);
+
       if (index != -1) {
-        checkedAnswers.value.splice(index, 1);
+        response.value.splice(index, 1);
         return;
       }
-      checkedAnswers.value.push(e);
+      response.value.push(e);
+      console.log(response.value);
     };
     const seeChecked = () => {
-      console.log(checkedAnswers.value);
+      console.log(response.value);
+    };
+    const getResponse = () => {
+      return {question_id:props.question.id,response:response.value};
     };
 
     const answers = computed(() =>
@@ -57,9 +63,10 @@ export default {
 
     return {
       answers,
-      checkedAnswers,
-      checkAnswer,
+      response,
+      setResponse,
       seeChecked,
+      getResponse
     };
   },
 };

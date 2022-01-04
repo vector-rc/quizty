@@ -1,0 +1,13 @@
+.form {
+    background: #fff;
+    border-radius: 5px;
+    width: 15rem;
+    margin: 1rem 0;
+    text-align: start;
+    padding: 0.5rem;
+    transition: all;
+    transition-duration: 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}

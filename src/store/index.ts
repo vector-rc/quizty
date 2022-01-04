@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import uuid from "../shared/uuid.js";
+import uuid from "../shared/uuid";
 
 const firstUUID = uuid();
 
@@ -12,7 +12,7 @@ export default createStore({
       {
         id: firstUUID,
         question: "¿Cual es tu nombre?",
-        type_answers: "free",
+        type_answer: "free",
         required: true,
       },
     ],
@@ -33,7 +33,7 @@ export default createStore({
   },
   mutations: {
     setNameQuiz(state, payload) {
-      state.nameQuiz = payload.nameQuiz;
+      state.name_quiz = payload.nameQuiz;
     },
     addQuestion(state, payload) {
       state.questions.push(payload.question);
@@ -85,25 +85,48 @@ export default createStore({
     },
   },
   actions: {
-    async login({ }, { user, password }) {
-      console.log(user, password);
-      const req = await fetch(process.env.VUE_APP_API_URL, {
+   async getIp()  {
+     const req=await fetch('https://api.myip.com')
+     const res=await req.json();
+     console.log(res);
+     
+   },
+    async login({ }, { email, password }) {
+      const req = await fetch(`${process.env.VUE_APP_API_URL}login`, {
         credentials: 'include',
         method: 'POST',
-        body: JSON.stringify({ user, password })
+        body: JSON.stringify({ email, password })
       })
 
-      const { success, data, msg } = await req.json()
-      localStorage.session_id = data.session_id
-      localStorage.user = user.value
-      document.cookie = `session_id=${data.session_id}`
+      const res = await req.json()
 
-      return msg
+      localStorage.session_id = res.data.id
+      localStorage.user_id = res.data.user_id
+      document.cookie = `session_id=${res.data.id}`
+
+      return res.message
+
+    },
+    async signup({ }, payload) {
+      const req = await fetch(`${process.env.VUE_APP_API_URL}signup`, {
+        credentials: 'include',
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+
+      const res= await req.json()
+
+      localStorage.session_id = res.data.id
+      localStorage.user = res.data.user_id
+      document.cookie = `session_id=${res.data.id}`
+
+      return res.message
 
     },
     async saveQuiz({ commit, state }) {
-      const req = await fetch(`${process.env.VUE_APP_API_URL}/add/quiz`, {
+      const req = await fetch(`${process.env.VUE_APP_API_URL}quiz/7`, {
         method: "POST",
+        credentials:'include',
         body: JSON.stringify({
           id: uuid(),
           name: state.name_quiz,
@@ -114,18 +137,38 @@ export default createStore({
       })
 
       const data = await req.json()
-      return data.id
+      return data.data.id
     },
     async fetchQuiz({ commit }, { quizId }) {
-      let request = await fetch(`${process.env.VUE_APP_API_URL}/quiz/${quizId}`);
+      let request = await fetch(`${process.env.VUE_APP_API_URL}quiz/${quizId}`,{credentials:'include'});
       let data = await request.json();
-      commit("setQuiz", { quiz: data });
+      commit("setQuiz", { quiz: data.data });
     },
     async fetchQuizes({ commit }) {
-      let request = await fetch(`${process.env.VUE_APP_API_URL}/quizes`);
+      let request = await fetch(`${process.env.VUE_APP_API_URL}quizes`);
       let data = await request.json();
       commit("setQuiz", { quiz: data });
       return data;
+    },
+    async fetchQuizesByUserId() {
+      let request = await fetch(`${process.env.VUE_APP_API_URL}${localStorage.user_id}/quizes`);
+      let data = await request.json();
+      return data.data;
+    },
+
+    async sendSolvedQuiz({},{quiz_id,duration,responses}) {
+      let request = await fetch(`${process.env.VUE_APP_API_URL}solved_quiz`,{
+        method:'POST',
+        credentials:'include',
+        body:JSON.stringify({
+          quiz_id,
+          duration,
+          responses,
+        })
+      });
+      let data = await request.json();
+      
+      return data.message;
     },
   },
   modules: {},

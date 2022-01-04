@@ -1,25 +1,27 @@
 <template>
-    <form action="">
-        <input type="text" v-model="user">
-        <input type="password" v-model="password">
-        <button @click.prevent="login">ver</button>
+    <form class="form">
+        <input type="email" placeholder="email" v-model="user.email" />
+        <br />
+        <input type="password" placeholder="password" v-model="user.password" />
+        <br />
+        <button @click.prevent="login">Ingresar</button>
     </form>
 </template>
 <script lang="ts">
-import { defineComponent ,ref} from 'vue'
-import {useStore} from 'vuex'
+import { defineComponent, reactive, ref } from 'vue'
+import { useStore } from 'vuex'
 export default defineComponent({
     setup() {
-        const user=ref('')
-        const password=ref('')
+        const user = reactive({email:'',password:''})
 
-        const store=useStore();
-        const login=async ()=>{            
-            const data = await store.dispatch('login',{user:user.value,password:password.value})
+        const store = useStore();
+        const login = async () => {
+            const data = await store.dispatch('login',user)
             console.log(data.message);
         }
 
-        return {user,password,login}
+        return { user, login }
     },
 })
 </script>
+

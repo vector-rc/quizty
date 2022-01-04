@@ -19,7 +19,7 @@
     </label>
 
     <label> tipo de respuesta </label>
-    <select v-model="type_answers" @change="saveQuestion">
+    <select v-model="type_answer" @change="saveQuestion">
       <option value="multiple">Multiple</option>
       <option value="free">Libre</option>
       <option value="single">una respuesta</option>
@@ -31,7 +31,7 @@
       @click="removeQuestion"
       :disabled="questions.length <= 1"
     />
-    <div v-if="type_answers != 'free'" class="answers">
+    <div v-if="type_answer != 'free'" class="answers">
       <answer-write
         v-for="answer in answers"
         :key="answer.id"
@@ -63,8 +63,8 @@ export default {
   setup(props) {
     const store = useStore();
     const required = ref(props.question.required);
-    const type_answers = ref(props.question.type_answers);
-    provide("type_answers", type_answers);
+    const type_answer = ref(props.question.type_answer);
+    provide("type_answer", type_answer);
 
     const question = ref(props.question.question);
     const questionId = ref(props.question.id);
@@ -77,14 +77,14 @@ export default {
       //console.log(answers.value);
       
       return (
-        type_answers.value != "free" &&
+        type_answer.value != "free" &&
         answers.value.filter((e) => e.isCorrect === true).length ==0
       );
     });
     const saveQuestion = () => {
-      // console.log(type_answers.value);
+      // console.log(type_answer.value);
       // console.log( answers.value.length);
-      if (type_answers.value != "free" && answers.value.length == 0) {
+      if (type_answer.value != "free" && answers.value.length == 0) {
         store.commit("addAnswers", {
           answers: [
             {
@@ -107,7 +107,7 @@ export default {
         question: {
           id: questionId.value,
           question: question.value,
-          type_answers: type_answers.value,
+          type_answer: type_answer.value,
           required: required.value,
         },
       });
@@ -144,7 +144,7 @@ export default {
       removeQuestion,
       required,
       questions,
-      type_answers,
+      type_answer,
       haveAnswerCorrect,
     };
   },

@@ -1,19 +1,19 @@
 <template>
   <div class="answer-write" style="margin: 1rem">
     <input
-      v-if="type_answers == 'multiple'"
+      v-if="type_answer == 'multiple'"
       type="checkbox"
       :checked="answer.isCorrect"
       @input="isCorrect = $event.target.checked"
       @change="saveAnswer"
     />
     <input
-      v-if="type_answers == 'single'"
+      v-if="type_answer == 'single'"
       type="radio"
       :name="answer.questionId"
       :checked="isCorrect"
       @change="saveAnswer"
-      :required="type_answers == 'single'"
+      :required="type_answer == 'single'"
     />
     <input
       type="text"
@@ -39,7 +39,7 @@ export default {
     multiple: Boolean,
   },
   setup(props) {
-    const type_answers = inject("type_answers");
+    const type_answer = inject("type_answer");
     const answer_text = ref(props.answer.answer);
     const isCorrect = ref(props.answer.isCorrect);
     const store = useStore();
@@ -49,7 +49,7 @@ export default {
       )
     );
     const saveAnswer = () => {
-      if (type_answers.value == "single") {
+      if (type_answer.value == "single") {
         answers.value.forEach((e) => {
           e.isCorrect = false;
         });
@@ -79,7 +79,7 @@ export default {
       isCorrect,
       removeAnswer,
       answers,
-      type_answers,
+      type_answer,
     };
   },
 };
