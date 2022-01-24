@@ -1,47 +1,35 @@
 <template>
   <div class="answer-write" style="margin: 1rem">
     <input
-      v-if="type_answer == 'multiple'"
+      v-if="type_answer === 'multiple'"
       type="checkbox"
       :checked="answer.isCorrect"
-      @input="isCorrect = $event.target.checked"
+      @input="answer.isCorrect = $event.target.checked"
       @change="saveAnswer"
     />
     <input
-      v-if="type_answer == 'single'"
+      v-if="type_answer === 'single'"
       type="radio"
       :name="answer.questionId"
-      :checked="isCorrect"
+      :checked="answer.isCorrect"
       @change="saveAnswer"
-      :required="type_answer == 'single'"
+      :required="type_answer === 'single'"
     />
-    <input
-      type="text"
-      style="width: 20rem"
-      v-model="answer_text"
-      @keyup="saveAnswer"
-    />
-    <input
-      type="button"
-      value="🗑️"
-      @click="removeAnswer"
-      :disabled="answers.length <= 2"
-    />
+    <input type="text" required style="width: 20rem" v-model="answer.answer" @keyup="saveAnswer" />
+    <input type="button" value="🗑️" @click="removeAnswer" :disabled="answers.length <= 2" />
   </div>
 </template>
 
 <script>
-import { ref, inject, computed } from "vue";
+import {inject, computed, reactive } from "vue";
 import { useStore } from "vuex";
 export default {
   props: {
     answer: Object,
-    multiple: Boolean,
   },
   setup(props) {
     const type_answer = inject("type_answer");
-    const answer_text = ref(props.answer.answer);
-    const isCorrect = ref(props.answer.isCorrect);
+    const answer = reactive(props.answer)
     const store = useStore();
     const answers = computed(() =>
       store.state.answers.filter(
@@ -49,19 +37,14 @@ export default {
       )
     );
     const saveAnswer = () => {
-      if (type_answer.value == "single") {
+      if (type_answer.value === "single") {
         answers.value.forEach((e) => {
           e.isCorrect = false;
         });
-        isCorrect.value = true;
+        answer.isCorrect = true;
       }
       store.commit("editAnswer", {
-        answer: {
-          id: props.answer.id,
-          questionId: props.answer.questionId,
-          answer: answer_text.value,
-          isCorrect: isCorrect.value,
-        },
+        answer,
       });
     };
 
@@ -75,8 +58,7 @@ export default {
 
     return {
       saveAnswer,
-      answer_text,
-      isCorrect,
+      answer,
       removeAnswer,
       answers,
       type_answer,
@@ -86,6 +68,4 @@ export default {
 </script>
 
 <style>
-
-
 </style>

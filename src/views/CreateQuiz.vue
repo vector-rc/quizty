@@ -1,108 +1,75 @@
 <template>
-  <form class="quiz">
-    <label
-      >Nombre de la prueba
-      <input
-        style="width: 20rem; border: none"
-        required
-        placeholder="Nombre del Quiz"
-        type="text"
-        v-model="name_quiz"
-    /></label>
-    <select >
-      <option value="quiz">Examen</option>
-      <option value="survey">Encuesta</option>
-    </select>
+<div>
+  <label for="settings">Settings  </label><input class="hidden" type="radio" v-model="test" id="settings" name="test" value="settings">
+  <label for="questions">Questions</label><input class="hidden"  type="radio" v-model="test" id="questions" name="test"  value="questions">
+</div>
+  <form class="quiz" id="formQuiz">
+     <div class="fieldForm">
+      <label for="quizName"> Nombre de la prueba</label>
+      <input class="p-inputtext" required placeholder="Nombre del Quiz" id="quizName" v-model="quiz.name" />
+      <div >
+      <input type="submit" value="Publicar Ahora" @click.prevent="saveQuiz" />
+      <input type="submit" value="Guardar y publicar mas tarde" @click.prevent="saveQuiz" />
+    </div>
+    </div>
+    <post-options v-if="test==='settings'"/>
+<div v-if="test==='questions'">
 
-    <label for="duration">Duracion</label>
-    <label for="ilimited">
-      <input type="checkbox" v-model="unlimited_time" />
-      Ilimitado
-    </label>
-    <label v-if="!unlimited_time">
-      <input type="number" id="duration" v-model="duration_quiz" min="1" />
-      minutos
-    </label>
-    <input type="submit" value="Guardar Test" @click.prevent="saveQuiz" />
-
-    <question-write
-      v-for="question in questions"
-      :key="question.id"
-      :question="question"
-    />
+    <question-write v-for="question in questions" :key="question.id" :question="question" />
     <input type="button" value="Agregar pregunta" @click="addQuestion" />
+</div>
   </form>
 </template>
 
-<script>
-import { computed, ref } from "vue";
+<script lang="ts">
+import { computed, reactive, ref } from "vue";
 import { useStore } from "vuex";
-import uuid from "../shared/uuid";
-
+import { useMessage } from "naive-ui";
 import QuestionWrite from "../components/QuestionWrite.vue";
+import PostOptions from "../components/PostOptions.vue";
+
 export default {
   name: "CreateTest",
-  components: { QuestionWrite },
-  setup(props) {
+  components: { QuestionWrite,PostOptions },
+  setup() {
     const store = useStore();
-    const answers = computed(() => store.state.answers);
-    const addQuestion = () => {
-      const questionId = uuid();
-      store.commit("addQuestion", {
-        question: {
-          id: questionId,
-          question: "",
-          type_answer: "single",
-          required: true,
-        },
+    const message = useMessage();
+    const test=ref('questions')
 
-        answers: [
-          {
-            id: uuid(),
-            questionId: questionId,
-            answer: "Verdadero",
-            isCorrect: false,
-          },
-          {
-            id: uuid(),
-            questionId: questionId,
-            answer: "Falso",
-            isCorrect: false,
-          },
-        ],
-      });
-    };
+    const quiz = reactive({
+      type: "quiz",
+      name: "",
+      duration: 60,
+    });
+
     const questions = computed(() => store.state.questions);
-    const name_quiz = ref("");
-    const duration_quiz = ref(1);
-    const unlimited_time = ref(false);
+    const addQuestion = () => store.commit("addQuestion");
+
 
     const saveQuiz = async () => {
-      store.state.name_quiz = name_quiz.value;
-      store.state.duration_quiz = unlimited_time.value
-        ? -1
-        : duration_quiz.value * 60;
-      store.state.questions.forEach((e) => {
-        if (e.type_answer == "free") {
-          store.commit("removeQuestionAnswers", { questionId: e.id });
-        }
-      });
-      console.log(store.state.answers);
+      let form = document.getElementById("formQuiz") as HTMLFormElement;
+      if (!form.checkValidity()) return form.reportValidity();
 
-      const quizId = await store.dispatch("saveQuiz");
-      await alert(
-        `Quiz creado, ingres a ${window.location.origin + "/Quiz/" + quizId}`
-      );
+      //if (!quiz.name) return message.error("Complete el nombre");
+      //const isSomeQuestionEmpty = store.state.questions.some(({ question }:any) => question === "");
+      //if (isSomeQuestionEmpty) return message.error("Las pregunstas no pueden ser vacias");
+
+      store.state.questions.forEach(({ type_answer, questionId }: any) => {
+        if (type_answer === "free") store.commit("removeQuestionAnswers", { questionId });
+      });
+
+      
+      store.state.quiz = quiz;
+      const responseInfo = await store.dispatch("saveQuiz");
+
+      alert(`Quiz creado, ingresa ${window.location.origin + "/Quiz/" + responseInfo.data.id}`);
     };
 
     return {
       addQuestion,
-      name_quiz,
       questions,
       saveQuiz,
-      answers,
-      duration_quiz,
-      unlimited_time,
+      quiz,test
     };
   },
 };
@@ -111,7 +78,7 @@ export default {
 <style>
 input[type="text"] {
   outline: none;
-  border:none;
+  border: none;
   box-shadow: none;
   border-bottom: 1px #2c3e5044 solid;
 }
@@ -125,4 +92,13 @@ input[type="text"] {
   justify-items: center;
   width: 70%;
 }
+.fieldForm {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.hidden{
+  display: none;
+}
+
 </style>

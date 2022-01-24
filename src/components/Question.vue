@@ -21,7 +21,7 @@
         v-model="response"
       />
     </div>
-    <button @click="seeChecked">ver respuesta</button>
+    <!-- <button @click="seeChecked">ver respuesta</button> -->
   </div>
 </template>
 

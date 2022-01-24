@@ -1,28 +1,41 @@
 <template>
     <form class="form">
-        <input type="text" placeholder="Nombre" v-model="user.name" />
+        <n-input type="text" required placeholder="Nombre" v-model:value="user.name" />
         <br />
-        <input type="email" placeholder="Email" v-model="user.email" />
+        <n-input placeholder="Email" v-model:value="user.email" />
         <br />
-        <input type="password" placeholder="contraseña" v-model="user.password" />
+        <n-input type="password" placeholder="contraseña" v-model:value="user.password" />
         <br />
-        <span>{{ user.name }}</span>
-        <b></b>
-        <input type="password" placeholder="repetir contraseña" id="verify-pass" />
+        <n-input
+            type="password"
+            placeholder="repetir contraseña"
+            v-model:value="user.password_repeat"
+        />
         <br />
-        <button @click.prevent="signup">Registrarse</button>
+        <n-button @click="signup">Registrarse</n-button>
     </form>
 </template>
 <script lang="ts">
+import { useMessage, NInput, NButton } from 'naive-ui';
 import { defineComponent, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 export default defineComponent({
+    components: {
+        NInput,
+        NButton
+    },
     setup() {
-        const user = reactive({ name: '', email: '', password: '' })
+
+        const message = useMessage()
+        const user = reactive({ name: '', email: '', password: '', password_repeat: '' })
 
         const store = useStore()
 
         const signup = () => {
+            if (user.password != user.password_repeat) {
+                message.error('las contraseñas no coinciden')
+                return
+            }
             store.dispatch('signup', user)
         }
 

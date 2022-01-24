@@ -1,63 +1,43 @@
 import { createStore } from "vuex";
 import uuid from "../shared/uuid";
 
-const firstUUID = uuid();
-
 export default createStore({
   state: {
-    quiz: {},
-    name_quiz: "",
-    duration_quiz: -1,
+    session_id: "" as string | undefined,
+    quiz: {} as any,
+    quizOptions:{} as any,
     questions: [
       {
-        id: firstUUID,
+        id: uuid(),
         question: "¿Cual es tu nombre?",
         type_answer: "free",
         required: true,
       },
     ],
-    answers: [
-      {
-        id: uuid(),
-        questionId: firstUUID,
-        answer: "Fernando",
-        isCorrect: false,
-      },
-      {
-        id: uuid(),
-        questionId: firstUUID,
-        answer: "Fernando",
-        isCorrect: false,
-      },
-    ],
+    answers: [] as Array<any>,
   },
   mutations: {
-    setNameQuiz(state, payload) {
-      state.name_quiz = payload.nameQuiz;
-    },
-    addQuestion(state, payload) {
-      state.questions.push(payload.question);
-      state.answers.push(...payload.answers);
+    addQuestion(state) {
+      state.questions.push({
+        id: uuid(),
+        question: "",
+        type_answer: "free",
+        required: true,
+      });
     },
 
     editQuestion(state, payload) {
-      let index = state.questions.findIndex(
-        (i) => i.id === payload.question.id
-      );
+      const index = state.questions.findIndex((i) => i.id === payload.question.id);
       state.questions[index] = payload.question;
     },
 
     removeQuestion(state, payload) {
-      let index = state.questions.findIndex((i) => i.id === payload.questionId);
-      state.answers = state.answers.filter(
-        (e) => payload.questionId != e.questionId
-      );
+      const index = state.questions.findIndex((i) => i.id === payload.questionId);
+      state.answers = state.answers.filter((e) => payload.questionId != e.questionId);
       state.questions.splice(index, 1);
     },
     removeQuestionAnswers(state, payload) {
-      state.answers = state.answers.filter(
-        (e) => payload.questionId != e.questionId
-      );
+      state.answers = state.answers.filter((e) => payload.questionId != e.questionId);
     },
 
     addAnswers(state, payload) {
@@ -65,17 +45,12 @@ export default createStore({
       //console.log(payload.answers);
     },
 
-    editAnswer(state, payload) {
-      let indexAnswer = state.answers.findIndex(
-        (i) => i.id === payload.answer.id
-      );
-      state.answers[indexAnswer].answer = payload.answer.answer;
-      state.answers[indexAnswer].isCorrect = payload.answer.isCorrect;
+    editAnswer({ answers }, { answer }) {
+      const indexAnswer = answers.findIndex(({ id }) => id === answer.id);
+      answers[indexAnswer] = answer;
     },
     removeAnswer(state, payload) {
-      let indexAnswer = state.answers.findIndex(
-        (i) => i.id === payload.answerId
-      );
+      const indexAnswer = state.answers.findIndex((i) => i.id === payload.answerId);
 
       state.answers.splice(indexAnswer, 1);
     },
@@ -85,90 +60,95 @@ export default createStore({
     },
   },
   actions: {
-   async getIp()  {
-     const req=await fetch('https://api.myip.com')
-     const res=await req.json();
-     console.log(res);
-     
-   },
-    async login({ }, { email, password }) {
-      const req = await fetch(`${process.env.VUE_APP_API_URL}login`, {
-        credentials: 'include',
-        method: 'POST',
-        body: JSON.stringify({ email, password })
-      })
-
-      const res = await req.json()
-
-      localStorage.session_id = res.data.id
-      localStorage.user_id = res.data.user_id
-      document.cookie = `session_id=${res.data.id}`
-
-      return res.message
-
+    async getIp() {
+      const req = await fetch("https://api.myip.com");
+      const res = await req.json();
+      console.log(res);
     },
-    async signup({ }, payload) {
+    async login({ state }, { email, password }) {
+      const req = await fetch(`${process.env.VUE_APP_API_URL}login`, {
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const res = await req.json();
+      state.session_id = res.data.id;
+      localStorage.user_id = res.data.user_id;
+      document.cookie = `session_id=${res.data.id}`;
+
+      return res;
+    },
+    async signup({ state }, payload) {
       const req = await fetch(`${process.env.VUE_APP_API_URL}signup`, {
-        credentials: 'include',
-        method: 'POST',
-        body: JSON.stringify(payload)
-      })
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
 
-      const res= await req.json()
+      const res = await req.json();
+      state.session_id = res.data.id;
+      localStorage.user_id = res.data.user_id;
 
-      localStorage.session_id = res.data.id
-      localStorage.user = res.data.user_id
-      document.cookie = `session_id=${res.data.id}`
+      document.cookie = `session_id=${res.data.id}`;
 
-      return res.message
-
+      return res.message;
     },
     async saveQuiz({ commit, state }) {
       const req = await fetch(`${process.env.VUE_APP_API_URL}quiz/7`, {
         method: "POST",
-        credentials:'include',
+        credentials: "include",
         body: JSON.stringify({
-          id: uuid(),
-          name: state.name_quiz,
-          duration: state.duration_quiz,
+          ...state.quiz,
+          duration: state.quiz.duration * 60,
           questions: state.questions,
           answers: state.answers,
         }),
-      })
+      });
 
-      const data = await req.json()
-      return data.data.id
+      const data = await req.json();
+      return data;
     },
     async fetchQuiz({ commit }, { quizId }) {
-      let request = await fetch(`${process.env.VUE_APP_API_URL}quiz/${quizId}`,{credentials:'include'});
-      let data = await request.json();
+      const request = await fetch(`${process.env.VUE_APP_API_URL}quiz/${quizId}`, { credentials: "include" });
+      const data = await request.json();
       commit("setQuiz", { quiz: data.data });
+      return data;
     },
-    async fetchQuizes({ commit }) {
-      let request = await fetch(`${process.env.VUE_APP_API_URL}quizes`);
-      let data = await request.json();
-      commit("setQuiz", { quiz: data });
+    async fetchQuizes() {
+      const request = await fetch(`${process.env.VUE_APP_API_URL}quizes`);
+      const data = await request.json();
       return data;
     },
     async fetchQuizesByUserId() {
-      let request = await fetch(`${process.env.VUE_APP_API_URL}${localStorage.user_id}/quizes`);
-      let data = await request.json();
+      const request = await fetch(`${process.env.VUE_APP_API_URL}my_quizes`, {
+        credentials: "include",
+      });
+      const data = await request.json();
       return data.data;
     },
 
-    async sendSolvedQuiz({},{quiz_id,duration,responses}) {
-      let request = await fetch(`${process.env.VUE_APP_API_URL}solved_quiz`,{
-        method:'POST',
-        credentials:'include',
-        body:JSON.stringify({
+    async sendSolvedQuiz({}, { quiz_id, duration, responses }) {
+      const request = await fetch(`${process.env.VUE_APP_API_URL}solved_quiz`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
           quiz_id,
           duration,
           responses,
-        })
+        }),
       });
-      let data = await request.json();
-      
+      const data = await request.json();
+
       return data.message;
+    },
+    async fetchStatistics({}, { quiz_id }) {
+      const request = await fetch(`${process.env.VUE_APP_API_URL}statistics/${quiz_id}`, {
+        credentials: "include",
+      });
+      const data = await request.json();
+
+      return data;
     },
   },
   modules: {},

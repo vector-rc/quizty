@@ -1,7 +1,6 @@
 <template>
   <div class="answer">
     <label>
-      {{id}}
       <input
         v-if="type_answer == 'multiple'"
         @change="$emit('checkAnswer', id)"

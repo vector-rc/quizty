@@ -1,7 +1,24 @@
 <template>
-  <app-header />
-  <router-view />
+  <n-message-provider placement="bottom">
+    <app-header />
+    <router-view />
+    <app-footer/>
+  </n-message-provider>
 </template>
+
+<script>
+import AppHeader from './components/AppHeader.vue'
+import { NMessageProvider } from 'naive-ui'
+import AppFooter from './components/AppFooter.vue'
+export default {
+  components: {
+    AppHeader,
+    NMessageProvider,
+    AppFooter
+  }
+
+}
+</script>
 
 <style>
 #app {
@@ -23,9 +40,8 @@
   box-sizing: border-box;
 }
 
-
 #nav {
-  padding: 30px;
+  padding: 1rem;
 }
 
 #nav a {
@@ -37,14 +53,3 @@
   color: #42b983;
 }
 </style>
-<script>
-import AppHeader from './components/AppHeader.vue'
-export default {
-  components:{
-    AppHeader
-  }
-  
-}
-</script>
-
-AppHeader
