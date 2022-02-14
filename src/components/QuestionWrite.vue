@@ -8,162 +8,124 @@
       margin: 1rem 0;
     "
   >
-   <div class="fieldForm">
-     
-    <label>
-      Pregunta:
-      <input
-        type="text"
-        required
-        style="width: 20rem"
-        v-model="question.question"
-        @keyup="saveQuestion"
-      />
-      
-    </label><input
-      type="button"
-      value="Eliminar Pregunta"
-      @click="removeQuestion"
-      :disabled="questions.length <= 1"
-    />
-   </div>
     <div class="fieldForm">
-    <label>
-      <input
-        v-model="question.required"
-        type="checkbox"
-        @change="saveQuestion"
-      />
-      respuesta obligatoria
-    </label>
+      <label>
+        Pregunta:
+        <input type="text" required style="width: 20rem" v-model="question.question" @keyup="saveQuestion" /> </label
+      ><input type="button" value="Eliminar Pregunta" @click="removeQuestion" :disabled="questions.length <= 1" />
     </div>
-     <div class="fieldForm">
-    <label>tipo de respuesta</label>
-    <select v-model="question.type_answer" @change="saveQuestion">
-      <option value="multiple">Multiple</option>
-      <option value="free">Libre</option>
-      <option value="single">Unica</option>
-    </select>
-     </div>
-    
-    <div v-if="question.type_answer != 'free'" class="answers">
-      <answer-write
-        v-for="answer in answers"
-        :key="answer.id"
-        :answer="answer"
-      />
+    <div class="fieldForm">
+      <label>
+        <input v-model="question.required" type="checkbox" @change="saveQuestion" />
+        respuesta obligatoria
+      </label>
+    </div>
+    <div class="fieldForm">
+      <label>tipo de respuesta</label>
+      <select v-model="question.typeAnswer" @change="saveQuestion">
+        <option value="multiple">Multiple</option>
+        <option value="free">Libre</option>
+        <option value="single">Unica</option>
+      </select>
+    </div>
+
+    <div v-if="question.typeAnswer != 'free'" class="answers">
+      <answer-write v-for="answer in answers" :key="answer.id" :answer="answer" />
 
       <input type="button" value="Agregar Respuesta" @click="addAnswer" />
     </div>
-    <small
-      style="color: tomato; border: solid 1px tomato; border-radius: 2px"
-      v-if="haveAnswerCorrect"
+    <small style="color: tomato; border: solid 1px tomato; border-radius: 2px" v-if="haveAnswerCorrect"
       >Marque alguna respuesta</small
     >
   </div>
 </template>
 
 <script lang="ts">
-import { computed, provide, ref, reactive, inject } from "vue";
-import { useStore } from "vuex";
+import { computed, provide } from 'vue'
+import { useStore } from 'vuex'
 
-import AnswerWrite from "./AnswerWrite.vue";
-import uuid from "../shared/uuid";
-
-interface Question {
-  id: string;
-  question: string;
-  required: boolean;
-  type_answer: string;
-}
+import AnswerWrite from './AnswerWrite.vue'
+import uuid from '../shared/uuid'
 
 export default {
   components: {
-    AnswerWrite,
+    AnswerWrite
   },
   props: {
-    question: Object,
+    question: Object
     // test:Function,
   },
-  emits: ["remove"],
-  setup(props:any) {
-    const store = useStore();
+  emits: ['remove'],
+  setup ({ question }) {
+    const store = useStore()
 
-    const question = reactive(props.question as Question);
-    const type_answer = computed(() => question.type_answer);
-    provide("type_answer", type_answer);
+    // const question = reactive(props.question as Question)
+    const typeAnswer = computed(() => question.typeAnswer)
+    provide('typeAnswer', typeAnswer)
 
-   
-
-    const questions = computed(() => store.state.questions);
-    const answers = computed(() =>
-      store.state.answers.filter((e: any) => e.questionId === question.id)
-    );
+    const questions = computed(() => store.state.questions)
+    const answers = computed(() => store.state.answers.filter((e: any) => e.questionId === question.id))
 
     const haveAnswerCorrect = computed(() => {
-      return (
-        question.type_answer != "free" &&
-        answers.value.filter((e: any) => e.isCorrect === true).length == 0
-      );
-    });
+      return question.typeAnswer !== 'free' && answers.value.filter((e: any) => e.isCorrect === true).length === 0
+    })
+
     const saveQuestion = () => {
       // props.test()
-      
-      if (question.type_answer != "free" && answers.value.length == 0) {
-        store.commit("addAnswers", {
+      if (question.typeAnswer !== 'free' && answers.value.length === 0) {
+        store.commit('addAnswers', {
           answers: [
             {
               id: uuid(),
               questionId: question.id,
-              answer: "Verdadero",
-              isCorrect: false,
+              answer: 'Verdadero',
+              isCorrect: false
             },
             {
               id: uuid(),
               questionId: question.id,
-              answer: "Falso",
-              isCorrect: false,
-            },
-          ],
-        });
+              answer: 'Falso',
+              isCorrect: false
+            }
+          ]
+        })
       }
 
-      store.commit("editQuestion", { question });
-    };
+      store.commit('editQuestion', { question })
+    }
 
     const removeQuestion = () => {
       if (questions.value.length > 1) {
-        store.commit("removeQuestion", {
-          questionId: question.id,
-        });
+        store.commit('removeQuestion', {
+          questionId: question.id
+        })
       }
-    };
+    }
 
     const addAnswer = () => {
-      store.commit("addAnswers", {
+      store.commit('addAnswers', {
         answers: [
           {
             id: uuid(),
             questionId: question.id,
-            answer: "",
-            isCorrect: false,
-          },
-        ],
-      });
-    };
+            answer: '',
+            isCorrect: false
+          }
+        ]
+      })
+    }
 
     return {
       answers,
       addAnswer,
-      question,
+      // question,
       saveQuestion,
       removeQuestion,
       questions,
-      haveAnswerCorrect,
-    };
-  },
-};
+      haveAnswerCorrect
+    }
+  }
+}
 </script>
 
-<style>
-</style>
+<style></style>

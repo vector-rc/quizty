@@ -6,11 +6,11 @@
 
 <script lang="ts">
 import ListQuizes from '@/components/ListQuizes.vue'
-import { defineComponent} from 'vue'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
-  components: { ListQuizes },
-  
+  components: { ListQuizes }
+
 })
 </script>
 00dc82

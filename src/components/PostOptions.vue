@@ -10,10 +10,10 @@
     <div class="fieldForm">
       <label for="duration">Duracion</label>
       <label for="ilimited">
-        <input type="checkbox" v-model="unlimited_time" />
+        <input type="checkbox" v-model="unlimitedTime" />
         Sin tiempo
       </label>
-      <label v-if="!unlimited_time">
+      <label v-if="!unlimitedTime">
         <input type="number" required id="duration" v-model="quizOptions.duration" min="1" />
         minutos
       </label>
@@ -42,32 +42,32 @@
 </template>
 
 <script lang="ts">
-import { computed,ref } from "vue";
-import { useStore } from "vuex";
+import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
 export default {
-  setup() {
-    const { state } = useStore();
+  setup () {
+    const { state } = useStore()
 
-    const publicNow = ref(true);
+    const publicNow = ref(true)
 
     const quizOptions = computed(() => {
-      return state.quizOptions;
-    });
+      return state.quizOptions
+    })
 
-    const withPassword = ref(false);
-    const isForever = ref(false);
-    const unlimited_time = ref(false);
+    const withPassword = ref(false)
+    const isForever = ref(false)
+    const unlimitedTime = ref(false)
 
     return {
       quizOptions,
       publicNow,
 
-      unlimited_time,
+      unlimitedTime,
       withPassword,
-      isForever,
-    };
-  },
-};
+      isForever
+    }
+  }
+}
 </script>
 <style scoped>
 .settings {

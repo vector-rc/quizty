@@ -9,14 +9,14 @@
       style="border: none; border-bottom: 1px solid #2c3e5066"
       type="text"
      v-model="response"
-      v-if="question.type_answer == 'free'"
+      v-if="question.typeAnswer === 'free'"
     />
-    <div v-if="question.type_answer != 'free'" class="answers">
-      <answer
+    <div v-if="question.typeAnswer !== 'free'" class="answers">
+      <answer-view
         v-for="answer in answers"
         :key="answer.id"
         :answer="answer"
-        :type_answer="question.type_answer"
+        :typeAnswer="question.typeAnswer"
         @checkAnswer="setResponse($event)"
         v-model="response"
       />
@@ -26,40 +26,39 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
-import { useStore } from "vuex";
-import Answer from "./Answer.vue";
+import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
+import AnswerView from './AnswerView.vue'
 export default {
-  components: { Answer },
+  components: { AnswerView },
 
   props: {
-    question: Object,
+    question: Object
   },
-  setup(props) {
-    const store = useStore();
-    const response = ref([]);
+  setup (props) {
+    const store = useStore()
+    const response = ref([])
 
     const setResponse = (e) => {
+      const index = response.value.findIndex((i) => i === e)
 
-      let index = response.value.findIndex((i) => i === e);
-
-      if (index != -1) {
-        response.value.splice(index, 1);
-        return;
+      if (index !== -1) {
+        response.value.splice(index, 1)
+        return
       }
-      response.value.push(e);
-      console.log(response.value);
-    };
+      response.value.push(e)
+      console.log(response.value)
+    }
     const seeChecked = () => {
-      console.log(response.value);
-    };
+      console.log(response.value)
+    }
     const getResponse = () => {
-      return {question_id:props.question.id,response:response.value};
-    };
+      return { question_id: props.question.id, response: response.value }
+    }
 
     const answers = computed(() =>
-      store.state.quiz.answers.filter((e) => e.questionId == props.question.id)
-    );
+      store.state.quiz.answers.filter((e) => e.questionId === props.question.id)
+    )
 
     return {
       answers,
@@ -67,9 +66,9 @@ export default {
       setResponse,
       seeChecked,
       getResponse
-    };
-  },
-};
+    }
+  }
+}
 </script>
 
 <style>

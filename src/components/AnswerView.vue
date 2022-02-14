@@ -2,14 +2,14 @@
   <div class="answer">
     <label>
       <input
-        v-if="type_answer == 'multiple'"
+        v-if="typeAnswer == 'multiple'"
         @change="$emit('checkAnswer', id)"
         :name="modelValue"
         :value="modelValue"
         type="checkbox"
       />
       <input
-        v-if="type_answer == 'single'"
+        v-if="typeAnswer == 'single'"
         @input="$emit('update:modelValue', $event.target.value)"
         :name="modelValue"
         :value="answer.id"
@@ -21,21 +21,21 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref } from 'vue'
 export default {
-  emits: ["update:modelValue", "checkAnswer"],
+  emits: ['update:modelValue', 'checkAnswer'],
   props: {
     answer: Object,
     modelValue: [String, Array],
-    type_answer: String,
+    typeAnswer: String
   },
-  setup(props) {
-    const id = ref(props.answer.id);
+  setup (props) {
+    const id = ref(props.answer.id)
     return {
-      id,
-    };
-  },
-};
+      id
+    }
+  }
+}
 </script>
 
 <style>

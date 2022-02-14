@@ -15,25 +15,25 @@
 </template>
 
 <script>
-import { useStore } from "vuex";
-import {NTable,NButton} from 'naive-ui'
+import { useStore } from 'vuex'
+import { NTable, NButton } from 'naive-ui'
 export default {
-  name: "ListQuizes",
-  components:{
+  name: 'ListQuizes',
+  components: {
     NTable,
     NButton
   },
   props: {
-    user_id: String,
+    user_id: String
   },
-  async setup() {
-    const store = useStore();
-    const quizes = await store.dispatch("fetchQuizesByUserId");
+  async setup () {
+    const store = useStore()
+    const quizes = await store.dispatch('fetchQuizesByUserId')
     return {
-      quizes,
-    };
-  },
-};
+      quizes
+    }
+  }
+}
 </script>
 
 <style scoped>

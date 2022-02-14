@@ -33,9 +33,8 @@ export default defineComponent({
     NButton
   },
 
-  setup() {
-
-    const store = useStore();
+  setup () {
+    const store = useStore()
 
     const isSessionInit = computed(() => {
       return store.state.session_id != null
@@ -44,7 +43,7 @@ export default defineComponent({
     return {
       isSessionInit
     }
-  },
+  }
 })
 </script>
 

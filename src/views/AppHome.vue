@@ -9,20 +9,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { NButton } from 'naive-ui';
-import { Accessibility24Filled, Home16Regular } from '@vicons/fluent';
-import { Icon } from '@vicons/utils'
+import { NButton } from 'naive-ui'
 
 export default defineComponent({
   components: {
-    NButton,
-    Accessibility24Filled,
-    Icon,
-    Home16Regular
+    NButton
   },
-  setup() {
-
-  },
+  setup () {}
 })
 </script>
 <style>
@@ -30,4 +23,3 @@ a {
   text-decoration: none;
 }
 </style>
-
